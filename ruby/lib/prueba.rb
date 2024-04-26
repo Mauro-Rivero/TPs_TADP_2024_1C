@@ -17,6 +17,10 @@ end
 
 class Module
   @interceptor
+  @invariantes = []
+  def invariant(&block)
+    @invariantes.push(block)
+  end
   def before_and_after_each_call(procBefore, procAfter)
     @interceptor = Interceptor.new(procBefore, procAfter, self)
   end
@@ -35,6 +39,16 @@ class Module
     end
   end
 
+end
+
+class Class
+  def self.new(args, &block)
+    # Tu implementación personalizada del método new aquí
+    instancia = allocate  # Crea una nueva instancia sin llamar a initialize
+    instancia.initialize(args, &block)  # Llama a initialize con los argumentos proporcionados
+    @invariantes.map { |invariant| invariant.instance_eval(instancia)}
+    return instancia
+  end
 end
 
 class Guerrero
