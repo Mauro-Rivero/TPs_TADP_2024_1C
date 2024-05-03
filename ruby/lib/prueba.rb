@@ -1,25 +1,17 @@
 class Interceptor
-
+  attr_accessor :procBefore, :procAfter
   def agregarBefore(procBefore)
-    @procsBefore ||= []
-    @procsBefore.push(procBefore)
-    end
+    @procBefore||=procBefore
+  end
 
   def agregarAfter(procAfter)
-    @procsAfter ||= []
-    @procsAfter.push(procAfter)
+    @procAfter||=procAfter
   end
 
-  def procBefore()
-    proc {@procsBefore.map { |procBefore| procBefore.call}}
-    end
-  def procAfter()
-    proc {@procsAfter.map { |procAfter| procAfter.call}}
-  end
+
 end
 
-module ContractualObject
-  
+class Module
   def invariant(&block)
     @invariantes ||= []
     @invariantes.push(block)
@@ -33,20 +25,27 @@ module ContractualObject
 #proc "intermedio" que chequee la invariante recibida, before and after, y que en caso de no cumplirse, tirar el error.
 
 #hablado en checkpoint
-  def method_added(name)
+
+
+end
+
+class Class
+  def self.method_added(name)
+    puts"ENTRE METHOD ADDED"
     unbound_method = self.instance_method(name)
+    @seSobreescribio ||= false
     if !@seSobreescribio
       @seSobreescribio = true
-      define_method(name) do
-        self.instance_eval(@interceptor.procBefore)
+      puts " #{self.instance_methods(false)}"
+      self.define_method(name) do
+        self.instance_eval(&@interceptor.procBefore)
         unbound_method.bind(self).call
-        self.instance_eval(@interceptor.procAfter)
+        self.instance_eval(&@interceptor.procAfter)
       end
     else
       @seSobreescribio = false
     end
   end
-
 end
 
 
@@ -61,20 +60,3 @@ end
 #     return instancia
 #   end
 # end
-
-class Guerrero
-  before_and_after_each_call(proc{puts "entre"},proc { puts "sali"})
-  before_and_after_each_call(proc{puts "otra"},proc { puts "sali 2"})
-
-
-  pre {puts ''} #tiene que dejar una "nota" para que el method_added sepa qué ejecutar/cuando hacerlo.
-  def hablar
-    puts "hola"
-  end
-
-end
-
-pepe = Guerrero.new
-
-pepe.hablar
-
