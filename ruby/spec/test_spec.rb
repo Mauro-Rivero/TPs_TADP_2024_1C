@@ -3,7 +3,7 @@ describe Prueba do
 
   describe '#materia' do
     it 'debería pasar este test' do
-      expect(prueba.materia).to be :tadp
+      class 
     end
   end
 end

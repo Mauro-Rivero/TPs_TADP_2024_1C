@@ -18,7 +18,7 @@ class Interceptor
   end
 end
 
-class Module
+module ContractualObject
   
   def invariant(&block)
     @invariantes ||= []
@@ -38,9 +38,9 @@ class Module
     if !@seSobreescribio
       @seSobreescribio = true
       define_method(name) do
-        @interceptor.procBefore.call
+        self.instance_eval(@interceptor.procBefore)
         unbound_method.bind(self).call
-        @interceptor.procAfter.call
+        self.instance_eval(@interceptor.procAfter)
       end
     else
       @seSobreescribio = false
@@ -48,6 +48,7 @@ class Module
   end
 
 end
+
 
 #usar attr accesor y metodos de atributos
 #esto no haria falta si el initialize esta contem´lado con el method added
