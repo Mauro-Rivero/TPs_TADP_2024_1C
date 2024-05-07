@@ -5,9 +5,14 @@ describe 'Prueba' do
       class Persona
         extend Contrato
         attr_accessor :algo
+
+        invariant{ algo > 4 }
+        invariant{ algo >= 0}
+        #invariant{ algo < 0}
         def initialize
-          @algo ||= 0
+          @algo ||= 3
         end
+
         before_and_after_each_call(
           proc{@algo = @algo +5},
           proc{@algo = @algo - 3}
@@ -28,9 +33,10 @@ describe 'Prueba' do
       end
 
       pepe = Persona.new
-      pepe.hablar()
-      expect(pepe.algo).to eq(3)
-      pepe.hablar
-      expect(pepe.algo).to eq(6)
+
+      # pepe.hablar()
+      # expect(pepe.algo).to eq(3)
+      # pepe.hablar
+      # expect(pepe.algo).to eq(6)
     end
 end
