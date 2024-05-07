@@ -2,21 +2,36 @@ require 'rspec'
 require_relative '../lib/prueba.rb'
 describe 'Prueba' do
     it 'debería pasar este test' do
-      class Persona < ClassPRUEBA
-        attr_accessor :contador
-        before_and_after_each_call(proc {@contador += 1}, proc{@contador -= 4})
+      class Persona
+        extend Contrato
 
-        def initialize(contador)
-          @contador = contador
-        end
-        def hablar
-          @contador += 1
-        end
+        before_and_after_each_call(
+          proc{puts"hola"},
+          proc{puts"chau"}
+        )
 
+        def hablar(algo)
+          puts "#{algo}"
+        end
       end
 
-      pepe = Persona.new(2)
-      pepe.hablar
-      expect(pepe.contador).to eq(0)
+      pepe = Persona.new
+      pepe.hablar(2)
+      Persona.define_method(:reir)do
+        puts "JAJAJAJA"
+      end
+      pepe.reir
+
+      class Auto
+        extend Contrato
+        before_and_after_each_call(proc{puts"brum"},proc{puts"choque"})
+      end
+
+      Auto.define_method(:algo)do
+        puts"CULOOOOOOOOOOOOOOO"
+      end
+
+      Auto.new.algo
+      pepe.reir
     end
 end
