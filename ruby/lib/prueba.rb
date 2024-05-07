@@ -22,6 +22,16 @@ module Contrato
     @procsInvariantes.push(procInvariante)
   end
 
+  def pre(&procPreRecibido)
+    @procsPre ||= []
+    @procsPre.push(procPreRecibido)
+  end
+
+  def pos(&procPostRecibido)
+    @procsPost ||= []
+    @procsPost.push(procPostRecibido)
+  end
+
   def method_added(method_name)
     @seSobreescribio ||= false
       original_method = instance_method(method_name)
@@ -36,9 +46,13 @@ module Contrato
         else
           afterProc = procAfter
           beforeProc = procBefore
+          preProc = procPre
+          postProc = procPost
           define_method(method_name) do |*args, &block|
             beforeProc.call(self)
+            preProc.call(self)
             ret = original_method.bind(self).call(*args, &block)
+            postProc.call(self)
             afterProc.call(self)
             return ret
           end
@@ -69,6 +83,16 @@ module Contrato
     else
       proc{|obj| @procsInvariantes.each do |invariant| obj.instance_eval(&invariant) end}
     end
+  end
+
+  def procPre()
+    proc{|obj| @procsPre.each do |preProc| obj.instance_eval(&preProc) end}
+
+  end
+
+  def procPost()
+    proc{|obj| @procsPost.each do |postProc| obj.instance_eval(&postProc) end}
+
   end
 end
 

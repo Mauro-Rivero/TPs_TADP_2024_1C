@@ -27,13 +27,17 @@ describe 'Prueba' do
           @algo = algo
         end
 
-
+        pre {puts"SOY PRE"}
+        pre {puts"SOY PRE PARTE 2"}
+        pos {puts"SOY POS "}
+        pos {puts"SOY POS PARTE 2"}
         def hablar()
           @algo = @algo-5
         end
       end
 
-      pepe = Persona.new(3)
+      pepe = Persona.new(780)
+      pepe.hablar
 
       # expect(pepe.algo).to eq(3)
       # pepe.hablar
