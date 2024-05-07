@@ -9,6 +9,14 @@ describe 'Prueba' do
           proc{puts"hola"},
           proc{puts"chau"}
         )
+        before_and_after_each_call(
+          proc{puts"hola"},
+          proc{puts"chau"}
+        )
+        before_and_after_each_call(
+          proc{puts"hola"},
+          proc{puts"chau"}
+        )
 
         def hablar(algo)
           puts "#{algo}"

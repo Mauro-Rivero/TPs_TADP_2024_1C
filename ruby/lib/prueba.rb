@@ -16,9 +16,9 @@ module Contrato
       afterProc = procAfter
       beforeProc = procBefore
       define_method(method_name) do |*args, &block|
-        self.instance_eval(&beforeProc)
+        beforeProc.call(self)
         original_method.bind(self).call(*args, &block)
-        self.instance_eval(&afterProc)
+        afterProc.call(self)
       end
     else
       @seSobreescribio = false
@@ -29,8 +29,7 @@ module Contrato
     if @procsBefore.nil?
     proc{puts"SALIO MAL ANTES"}
     else
-      puts"#{@procsBefore.nil?}"
-      proc{@procsBefore.each do |before| before.call end}
+      proc{|obj| @procsBefore.each do |before| obj.instance_eval(&before) end}
     end
   end
 
@@ -38,8 +37,7 @@ module Contrato
     if @procsAfter.nil?
       proc{puts"SALIO MAL DESPUES"}
     else
-      puts"#{@procsAfter.nil?}"
-      proc{@procsAfter.each do |after| after.call end}
+      proc{|obj| @procsAfter.each do |after| obj.instance_eval(&after) end}
     end
   end
 end
