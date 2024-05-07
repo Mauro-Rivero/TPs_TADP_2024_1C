@@ -9,9 +9,6 @@ describe 'Prueba' do
         invariant{ algo > 4 }
         invariant{ algo >= 0}
         #invariant{ algo < 0}
-        def initialize
-          @algo ||= 3
-        end
 
         before_and_after_each_call(
           proc{@algo = @algo +5},
@@ -26,15 +23,18 @@ describe 'Prueba' do
           proc{puts"chau"}
         )
 
+        def initialize(algo)
+          @algo = algo
+        end
+
 
         def hablar()
-          @algo = @algo+1
+          @algo = @algo-5
         end
       end
 
-      pepe = Persona.new
+      pepe = Persona.new(3)
 
-      # pepe.hablar()
       # expect(pepe.algo).to eq(3)
       # pepe.hablar
       # expect(pepe.algo).to eq(6)

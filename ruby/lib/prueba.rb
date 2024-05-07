@@ -10,9 +10,9 @@ module Contrato
   def invariant(&procRecibido)
     #proc que reciba el proc de la invariante, que lo evalue en self,
     # podemos cambiar el unless del method added por
-    procInvariante = proc{ |obj|
+    procInvariante = proc{
       begin
-        raise "Invariant no cumplida" if !obj.instance_eval(procRecibido)
+        raise "Invariant no cumplida" if !self.instance_eval(&procRecibido)
       rescue => error
         puts error.message
       end
@@ -23,25 +23,29 @@ module Contrato
   end
 
   def method_added(method_name)
-    if method_name.to_s == "initialize"
-      procInvariant.call(self)
-    else
     @seSobreescribio ||= false
       original_method = instance_method(method_name)
       if !@seSobreescribio
         @seSobreescribio = true
-        afterProc = procAfter
-        beforeProc = procBefore
-        define_method(method_name) do |*args, &block|
-          beforeProc.call(self)
-          ret = original_method.bind(self).call(*args, &block)
-          afterProc.call(self)
-          return ret
+        if method_name.to_s == "initialize"
+          invariantProc = procInvariant
+          define_method(method_name) do |*args, &block|
+            original_method.bind(self).call(*args, &block)
+            invariantProc.call(self)
+          end
+        else
+          afterProc = procAfter
+          beforeProc = procBefore
+          define_method(method_name) do |*args, &block|
+            beforeProc.call(self)
+            ret = original_method.bind(self).call(*args, &block)
+            afterProc.call(self)
+            return ret
+          end
         end
       else
         @seSobreescribio = false
       end
-    end
   end
 
   def procBefore()
@@ -63,7 +67,7 @@ module Contrato
     if @procsInvariantes.nil?
       proc{}
     else
-      proc{|obj| @procsInvariantes.each do |invariant| invariant.call(obj) end}
+      proc{|obj| @procsInvariantes.each do |invariant| obj.instance_eval(&invariant) end}
     end
   end
 end
