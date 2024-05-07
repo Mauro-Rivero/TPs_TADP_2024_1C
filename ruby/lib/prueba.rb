@@ -9,25 +9,28 @@ module Contrato
   end
 
   def method_added(method_name)
+    unless method_name.to_s == "initialize"
     @seSobreescribio ||= false
-    original_method = instance_method(method_name)
-    if !@seSobreescribio
-      @seSobreescribio = true
-      afterProc = procAfter
-      beforeProc = procBefore
-      define_method(method_name) do |*args, &block|
-        beforeProc.call(self)
-        original_method.bind(self).call(*args, &block)
-        afterProc.call(self)
+      original_method = instance_method(method_name)
+      if !@seSobreescribio
+        @seSobreescribio = true
+        afterProc = procAfter
+        beforeProc = procBefore
+        define_method(method_name) do |*args, &block|
+          beforeProc.call(self)
+          ret = original_method.bind(self).call(*args, &block)
+          afterProc.call(self)
+          return ret
+        end
+      else
+        @seSobreescribio = false
       end
-    else
-      @seSobreescribio = false
     end
   end
 
   def procBefore()
     if @procsBefore.nil?
-    proc{puts"SALIO MAL ANTES"}
+    proc{}
     else
       proc{|obj| @procsBefore.each do |before| obj.instance_eval(&before) end}
     end
@@ -35,7 +38,7 @@ module Contrato
 
   def procAfter()
     if @procsAfter.nil?
-      proc{puts"SALIO MAL DESPUES"}
+      proc{}
     else
       proc{|obj| @procsAfter.each do |after| obj.instance_eval(&after) end}
     end
