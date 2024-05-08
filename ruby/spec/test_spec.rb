@@ -27,20 +27,77 @@ describe 'Prueba' do
           @algo = algo
         end
 
-        pre {puts"SOY PRE"}
-        pre {puts"SOY PRE PARTE 2"}
-        pos {puts"SOY POS "}
-        pos {puts"SOY POS PARTE 2"}
+        pos {puts"#{algo}"}
         def hablar()
-          @algo = @algo-5
+          @algo = @algo-1
+        end
+
+        pre { algo >= 0 }
+        pos { algo >= 0 }
+        def morir()
+          puts "MORI"
         end
       end
 
-      pepe = Persona.new(780)
+      pepe = Persona.new(5)
       pepe.hablar
+      puts "nuevo metodo"
+      pepe.morir
 
       # expect(pepe.algo).to eq(3)
       # pepe.hablar
       # expect(pepe.algo).to eq(6)
+    end
+
+    it 'ejemplo' do
+      class Pila
+        extend Contrato
+        attr_accessor :current_node, :capacity
+
+        invariant { capacity >= 0 }
+
+        pos { empty? }
+        def initialize(capacity)
+          @capacity = capacity
+          @current_node = nil
+        end
+
+        pre { !full? }
+        pos { height > 0 }
+        def push(element)
+          @current_node = Node.new(element, current_node)
+        end
+
+        pre { !empty? }
+        def pop
+          element = top
+          @current_node = @current_node.next_node
+          element
+        end
+
+        pre { !empty? }
+        def top
+          current_node.element
+        end
+
+        def height
+          empty? ? 0 : current_node.size
+        end
+
+        def empty?
+          current_node.nil?
+        end
+
+        def full?
+          height == capacity
+        end
+
+        Node = Struct.new(:element, :next_node) do
+          def size
+            next_node.nil? ? 1 : 1 + next_node.size
+          end
+        end
+      end
+
     end
 end

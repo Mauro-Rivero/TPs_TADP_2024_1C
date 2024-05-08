@@ -23,36 +23,55 @@ module Contrato
   end
 
   def pre(&procPreRecibido)
+    procPre = proc{
+      begin
+        raise "Precondicion no cumplida" if !self.instance_eval(&procPreRecibido)
+      rescue => error
+        puts error.message
+      end
+    }
     @procsPre ||= []
-    @procsPre.push(procPreRecibido)
+    @procsPre.push(procPre)
   end
 
   def pos(&procPostRecibido)
+    procPost = proc{
+      begin
+        raise "Postcondición no cumplida" if !self.instance_eval(&procPostRecibido)
+      rescue => error
+        puts error.message
+      end
+    }
     @procsPost ||= []
-    @procsPost.push(procPostRecibido)
+    @procsPost.push(procPost)
   end
 
   def method_added(method_name)
     @seSobreescribio ||= false
-      original_method = instance_method(method_name)
+    original_method = instance_method(method_name)
+    preList ||= {}
+    preList[method_name] = procPre
+    postList ||= {}
+    postList[method_name] = procPost
       if !@seSobreescribio
         @seSobreescribio = true
         if method_name.to_s == "initialize"
           invariantProc = procInvariant
           define_method(method_name) do |*args, &block|
+            preList[method_name].call
             original_method.bind(self).call(*args, &block)
+            postList[method_name].call
             invariantProc.call(self)
           end
         else
+
           afterProc = procAfter
           beforeProc = procBefore
-          preProc = procPre
-          postProc = procPost
           define_method(method_name) do |*args, &block|
             beforeProc.call(self)
-            preProc.call(self)
+            preList[method_name].call
             ret = original_method.bind(self).call(*args, &block)
-            postProc.call(self)
+            postList[method_name].call
             afterProc.call(self)
             return ret
           end
@@ -60,6 +79,8 @@ module Contrato
       else
         @seSobreescribio = false
       end
+    @procsPost = []
+    @procsPre = []
   end
 
   def procBefore()
@@ -86,13 +107,21 @@ module Contrato
   end
 
   def procPre()
-    proc{|obj| @procsPre.each do |preProc| obj.instance_eval(&preProc) end}
-
+    if @procsPre.nil?
+      proc{}
+    else
+      preProcs = @procsPre.clone
+      proc{|obj| preProcs.each do |preProc| obj.instance_eval(&preProc) end}
+    end
   end
 
   def procPost()
-    proc{|obj| @procsPost.each do |postProc| obj.instance_eval(&postProc) end}
-
+    if @procsPost.nil?
+      proc{}
+    else
+      postProcs = @procsPost.clone
+      proc{|obj| postProcs.each do |postProc| obj.instance_eval(&postProc) end}
+    end
   end
 end
 
