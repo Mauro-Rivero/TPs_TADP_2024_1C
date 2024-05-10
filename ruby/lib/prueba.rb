@@ -11,11 +11,7 @@ module Contrato
     #proc que reciba el proc de la invariante, que lo evalue en self,
     # podemos cambiar el unless del method added por
     procInvariante = proc{
-      begin
         raise "Invariant no cumplida" if !self.instance_eval(&procRecibido)
-      rescue => error
-        puts error.message
-      end
     }
     before_and_after_each_call(proc{}, procInvariante)
     @procsInvariantes ||= []
@@ -24,11 +20,7 @@ module Contrato
 
   def pre(&procPreRecibido)
     procPre = proc{
-      begin
         raise "Precondicion no cumplida" if !self.instance_eval(&procPreRecibido)
-      rescue => error
-        puts error.message
-      end
     }
     @procsPre ||= []
     @procsPre.push(procPre)
@@ -36,11 +28,7 @@ module Contrato
 
   def pos(&procPostRecibido)
     procPost = proc{
-      begin
         raise "Postcondición no cumplida" if !self.instance_eval(&procPostRecibido)
-      rescue => error
-        puts error.message
-      end
     }
     @procsPost ||= []
     @procsPost.push(procPost)
@@ -58,9 +46,9 @@ module Contrato
         if method_name.to_s == "initialize"
           invariantProc = procInvariant
           define_method(method_name) do |*args, &block|
-            preList[method_name].call
+            preList[method_name].call(self)
             original_method.bind(self).call(*args, &block)
-            postList[method_name].call
+            postList[method_name].call(self)
             invariantProc.call(self)
           end
         else
@@ -69,9 +57,9 @@ module Contrato
           beforeProc = procBefore
           define_method(method_name) do |*args, &block|
             beforeProc.call(self)
-            preList[method_name].call
+            preList[method_name].call(self)
             ret = original_method.bind(self).call(*args, &block)
-            postList[method_name].call
+            postList[method_name].call(self)
             afterProc.call(self)
             return ret
           end

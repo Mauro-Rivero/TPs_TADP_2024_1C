@@ -7,7 +7,7 @@ describe 'Prueba' do
         attr_accessor :algo
 
         invariant{ algo > 4 }
-        invariant{ algo >= 0}
+        invariant{ algo > 0 && algo < 100 }
         #invariant{ algo < 0}
 
         before_and_after_each_call(
@@ -27,7 +27,7 @@ describe 'Prueba' do
           @algo = algo
         end
 
-        pos {puts"#{algo}"}
+        pos {algo > 1}
         def hablar()
           @algo = @algo-1
         end
