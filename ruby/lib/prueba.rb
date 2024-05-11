@@ -18,6 +18,9 @@ module Contrato
     @procsInvariantes.push(procInvariante)
   end
 
+
+  # [CORRECCION]
+  # Falta que los parametros del metodo esten disponibles dentro del contexto del pre
   def pre(&procPreRecibido)
     procPre = proc{
         raise "Precondicion no cumplida" if !self.instance_eval(&procPreRecibido)
@@ -26,6 +29,9 @@ module Contrato
     @procsPre.push(procPre)
   end
 
+  # [CORRECCION]
+  # Falta que los parametros del metodo esten disponibles dentro del contexto del pre
+  # y que reciba el resultado del metodo como parametro
   def pos(&procPostRecibido)
     procPost = proc{
         raise "Postcondición no cumplida" if !self.instance_eval(&procPostRecibido)
@@ -35,15 +41,23 @@ module Contrato
   end
 
   def method_added(method_name)
-    @seSobreescribio ||= false
+    # [CORRECCION]
+    # Explicar concepto de booly
+    #@seSobreescribio ||= false
     original_method = instance_method(method_name)
+    # [CORRECCION]
+    # Acá están creando un diccionario cada vez que se ejecuta method_added
     preList ||= {}
     preList[method_name] = procPre
     postList ||= {}
     postList[method_name] = procPost
       if !@seSobreescribio
         @seSobreescribio = true
+        # [CORRECCION]
+        # No hace falta convertir a string, pueden chequear contra el simbolo :initialize
         if method_name.to_s == "initialize"
+          # [CORRECCION]
+          # En lugar de copiar el proc al contexto, ¿por qué no pedirse a la clase de self?
           invariantProc = procInvariant
           define_method(method_name) do |*args, &block|
             preList[method_name].call(self)
@@ -71,6 +85,9 @@ module Contrato
     @procsPre = []
   end
 
+  # [CORRECCION]
+  # Si estan creando un proc que ejecute todo el acumulado para ver si alguno tira la excepción
+  # ¿Por qué no armar uno que tire la excepción si alguno de los proc da false?
   def procBefore()
     if @procsBefore.nil?
     proc{}

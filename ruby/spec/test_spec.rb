@@ -5,6 +5,8 @@ describe 'Prueba' do
     extend Contrato
     attr_accessor :current_node, :capacity
 
+    # [CORRECCION]
+    # Generalmente la forma de testear cosas que son puramente de comportamiento es con excepción.
     #AGREGAMOS ESTO PARA CHEQUEAR QUE FUNCIONE TAMBIÉN
     before_and_after_each_call(proc{puts"Entre a un metodo"}, proc{puts"Sali de un metodo"})
 
