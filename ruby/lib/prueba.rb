@@ -25,6 +25,7 @@ module Contrato
     procPre = proc{
         raise "Precondicion no cumplida" if !self.instance_eval(&procPreRecibido)
     }
+
     @procsPre ||= []
     @procsPre.push(procPre)
   end
@@ -47,15 +48,14 @@ module Contrato
     original_method = instance_method(method_name)
     # [CORRECCION]
     # Acá están creando un diccionario cada vez que se ejecuta method_added
+    # con $ lo hacemos global, puede funcar (probar)
     preList ||= {}
     preList[method_name] = procPre
     postList ||= {}
     postList[method_name] = procPost
       if !@seSobreescribio
         @seSobreescribio = true
-        # [CORRECCION]
-        # No hace falta convertir a string, pueden chequear contra el simbolo :initialize
-        if method_name.to_s == "initialize"
+        if method_name == :initialize
           # [CORRECCION]
           # En lugar de copiar el proc al contexto, ¿por qué no pedirse a la clase de self?
           invariantProc = procInvariant
@@ -66,10 +66,11 @@ module Contrato
             invariantProc.call(self)
           end
         else
-
           afterProc = procAfter
           beforeProc = procBefore
           define_method(method_name) do |*args, &block|
+            #LOGRAR QUE LOS PROCS PRE Y POST SE EJECUTEN DENTRO DEL CONEXTO DEL
+            # MÉTODO, ES LA UNICA FORMA DE QUE RECONOZCA VARIABLES DE EL PARÁMETRO
             beforeProc.call(self)
             preList[method_name].call(self)
             ret = original_method.bind(self).call(*args, &block)
@@ -85,14 +86,15 @@ module Contrato
     @procsPre = []
   end
 
-  # [CORRECCION]
+  # [CORRECCION] -- ¿"Hecha"?
   # Si estan creando un proc que ejecute todo el acumulado para ver si alguno tira la excepción
   # ¿Por qué no armar uno que tire la excepción si alguno de los proc da false?
   def procBefore()
     if @procsBefore.nil?
     proc{}
     else
-      proc{|obj| @procsBefore.each do |before| obj.instance_eval(&before) end}
+      #proc{|obj| @procsBefore.each do |before| obj.instance_eval(&before) end}
+      proc{@procsBefore.any?{|proc| proc.call(self)}} #si lo ven correcto, transportar al resto
     end
   end
 
@@ -129,27 +131,6 @@ module Contrato
     end
   end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
