@@ -33,8 +33,8 @@ module Contrato
   # Falta que los parametros del metodo esten disponibles dentro del contexto del pre
   # y que reciba el resultado del metodo como parametro
   def pos(&procPostRecibido)
-    procPost = proc{
-        raise "Postcondición no cumplida" if !self.instance_eval(&procPostRecibido)
+    procPost = proc{|result|
+        raise "Postcondición no cumplida" if !self.instance_exec(result,&procPostRecibido)
     }
     @procsPost ||= []
     @procsPost.push(procPost)
@@ -45,6 +45,7 @@ module Contrato
     # Explicar concepto de booly
     #@seSobreescribio ||= false
     original_method = instance_method(method_name)
+    parametros = original_method.parameters.map{|arg| arg[1]}
     # [CORRECCION]
     # Acá están creando un diccionario cada vez que se ejecuta method_added
     preList ||= {}
@@ -70,10 +71,15 @@ module Contrato
           afterProc = procAfter
           beforeProc = procBefore
           define_method(method_name) do |*args, &block|
+            (0...args.length).each { |i|
+              self.define_singleton_method(parametros[i])do
+                args[i]
+              end
+            }
             beforeProc.call(self)
             preList[method_name].call(self)
             ret = original_method.bind(self).call(*args, &block)
-            postList[method_name].call(self)
+            postList[method_name].call(self,ret)
             afterProc.call(self)
             return ret
           end
@@ -125,7 +131,7 @@ module Contrato
       proc{}
     else
       postProcs = @procsPost.clone
-      proc{|obj| postProcs.each do |postProc| obj.instance_eval(&postProc) end}
+      proc{|obj,result| postProcs.each do |postProc| obj.instance_exec(result, &postProc) end}
     end
   end
 end

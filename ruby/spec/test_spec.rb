@@ -8,7 +8,7 @@ describe 'Prueba' do
     # [CORRECCION]
     # Generalmente la forma de testear cosas que son puramente de comportamiento es con excepción.
     #AGREGAMOS ESTO PARA CHEQUEAR QUE FUNCIONE TAMBIÉN
-    before_and_after_each_call(proc{puts"Entre a un metodo"}, proc{puts"Sali de un metodo"})
+    # before_and_after_each_call(proc{puts"Entre a un metodo"}, proc{puts"Sali de un metodo"})
 
     invariant { capacity >= 0 }
 
@@ -48,6 +48,13 @@ describe 'Prueba' do
       height == capacity
     end
 
+    pre { divisor != 0 }
+    pos { |result| result * divisor + 1 == dividendo }
+    #postcondición de dividir
+    def dividir(dividendo, divisor)
+      dividendo / divisor
+    end
+
     Node = Struct.new(:element, :next_node) do
       def size
         next_node.nil? ? 1 : 1 + next_node.size
@@ -70,5 +77,16 @@ describe 'Prueba' do
   it 'deberia fallar precondición' do
     pila = Pila.new(0)
     expect{pila.top}.to raise_error RuntimeError
+  end
+
+  it 'deberia fallar precondicion dividir' do
+    pila = Pila.new(0)
+    expect{pila.dividir(4,0)}.to raise_error RuntimeError
+  end
+
+  it 'deberia fallar postcondicion dividir' do
+    pila = Pila.new(0)
+    expect{pila.dividir(4,2)}.to raise_error RuntimeError
+
   end
 end
