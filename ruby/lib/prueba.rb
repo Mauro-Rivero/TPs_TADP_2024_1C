@@ -86,7 +86,7 @@ module Contrato
       proc{}
     else
       listaClonada = lista.clone
-      proc{|obj,result| raise mensajeDeError if listaClonada.any?{|preProc| !obj.instance_exec(result,&preProc)}}
+      proc{|obj,result| raise mensajeDeError if listaClonada.any?{|unProc| !obj.instance_exec(result,&unProc)}}
     end
   end
 end
