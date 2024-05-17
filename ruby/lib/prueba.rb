@@ -8,68 +8,54 @@ module Contrato
   end
 
   def invariant(&procRecibido)
-    #proc que reciba el proc de la invariante, que lo evalue en self,
-    # podemos cambiar el unless del method added por
-    procInvariante = proc{
-        raise "Invariant no cumplida" if !self.instance_eval(&procRecibido)
-    }
-    before_and_after_each_call(proc{}, procInvariante)
     @procsInvariantes ||= []
-    @procsInvariantes.push(procInvariante)
+    @procsInvariantes.push(procRecibido)
   end
 
 
   # [CORRECCION]
   # Falta que los parametros del metodo esten disponibles dentro del contexto del pre
-  def pre(&procPreRecibido)
-    procPre = proc{
-        raise "Precondicion no cumplida" if !self.instance_eval(&procPreRecibido)
-    }
+  def pre(&procRecibido)
     @procsPre ||= []
-    @procsPre.push(procPre)
+    @procsPre.push(procRecibido)
   end
 
   # [CORRECCION]
   # Falta que los parametros del metodo esten disponibles dentro del contexto del pre
-  # y que reciba el resultado del metodo como parametro
-  def pos(&procPostRecibido)
-    procPost = proc{|result|
-        raise "Postcondición no cumplida" if !self.instance_exec(result,&procPostRecibido)
-    }
+  # TODO y que reciba el resultado del metodo como parametro DONE
+  def pos(&procRecibido)
     @procsPost ||= []
-    @procsPost.push(procPost)
+    @procsPost.push(procRecibido)
   end
 
   def method_added(method_name)
     # [CORRECCION]
-    # Explicar concepto de booly
+    # TODO Explicar concepto de booly DONE
     #@seSobreescribio ||= false
     original_method = instance_method(method_name)
     parametros = original_method.parameters.map{|arg| arg[1]}
     # [CORRECCION]
-    # Acá están creando un diccionario cada vez que se ejecuta method_added
-    preList ||= {}
-    preList[method_name] = procPre
-    postList ||= {}
-    postList[method_name] = procPost
+    # TODO Acá están creando un diccionario cada vez que se ejecuta method_added DONE
+    preProc = listToProc(@procsPre, "Precondición no cumplida")
+    postProc = listToProc(@procsPost, "Postcondición no cumplida")
+    invariantProc = listToProc(@procsInvariantes, "Invariante no cumplida")
       if !@seSobreescribio
         @seSobreescribio = true
         # [CORRECCION]
-        # No hace falta convertir a string, pueden chequear contra el simbolo :initialize
-        if method_name.to_s == "initialize"
+        # TODO No hace falta convertir a string, pueden chequear contra el simbolo :initialize DONE
+        if method_name == :initialize
           # [CORRECCION]
           # En lugar de copiar el proc al contexto, ¿por qué no pedirse a la clase de self?
-          invariantProc = procInvariant
           define_method(method_name) do |*args, &block|
-            preList[method_name].call(self)
+            preProc.call(self)
             original_method.bind(self).call(*args, &block)
-            postList[method_name].call(self)
+            postProc.call(self)
             invariantProc.call(self)
           end
         else
 
-          afterProc = procAfter
-          beforeProc = procBefore
+          afterProc = listToProc(@procsAfter, "")
+          beforeProc = listToProc(@procsBefore, "")
           define_method(method_name) do |*args, &block|
             (0...args.length).each { |i|
               self.define_singleton_method(parametros[i])do
@@ -77,10 +63,11 @@ module Contrato
               end
             }
             beforeProc.call(self)
-            preList[method_name].call(self)
+            preProc.call(self)
             ret = original_method.bind(self).call(*args, &block)
-            postList[method_name].call(self,ret)
+            postProc.call(self,ret)
             afterProc.call(self)
+            invariantProc.call(self)
             return ret
           end
         end
@@ -92,123 +79,14 @@ module Contrato
   end
 
   # [CORRECCION]
-  # Si estan creando un proc que ejecute todo el acumulado para ver si alguno tira la excepción
-  # ¿Por qué no armar uno que tire la excepción si alguno de los proc da false?
-  def procBefore()
-    if @procsBefore.nil?
-    proc{}
-    else
-      proc{|obj| @procsBefore.each do |before| obj.instance_eval(&before) end}
-    end
-  end
-
-  def procAfter()
-    if @procsAfter.nil?
+    # TODO Si estan creando un proc que ejecute todo el acumulado para ver si alguno tira la excepción DONE
+    # TODO ¿Por qué no armar uno que tire la excepción si alguno de los proc da false? DONE
+  def listToProc(lista, mensajeDeError)
+    if lista.nil?
       proc{}
     else
-      proc{|obj| @procsAfter.each do |after| obj.instance_eval(&after) end}
-    end
-  end
-  def procInvariant()
-    if @procsInvariantes.nil?
-      proc{}
-    else
-      proc{|obj| @procsInvariantes.each do |invariant| obj.instance_eval(&invariant) end}
-    end
-  end
-
-  def procPre()
-    if @procsPre.nil?
-      proc{}
-    else
-      preProcs = @procsPre.clone
-      proc{|obj| preProcs.each do |preProc| obj.instance_eval(&preProc) end}
-    end
-  end
-
-  def procPost()
-    if @procsPost.nil?
-      proc{}
-    else
-      postProcs = @procsPost.clone
-      proc{|obj,result| postProcs.each do |postProc| obj.instance_exec(result, &postProc) end}
+      listaClonada = lista.clone
+      proc{|obj,result| raise mensajeDeError if listaClonada.any?{|preProc| !obj.instance_exec(result,&preProc)}}
     end
   end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
-# class Module
-#   def invariant(&block)
-#     @invariantes ||= []
-#     @invariantes.push(block)
-#   end
-#   def before_and_after_each_call(procBefore, procAfter)
-#     @interceptor ||= Interceptor.new
-#     @interceptor.agregarBefore(procBefore)
-#     @interceptor.agregarAfter(procAfter)
-#   end
-#
-# #proc "intermedio" que chequee la invariante recibida, before and after, y que en caso de no cumplirse, tirar el error.
-#
-# #hablado en checkpoint
-#
-#
-# end
-#
-# class ClassPrueba
-#   def self.method_added(name)
-#     puts"ENTRE METHOD ADDED"
-#     unbound_method = self.instance_method(name)
-#     @seSobreescribio ||= false
-#     if !@seSobreescribio
-#       @seSobreescribio = true
-#       puts " #{self.instance_methods(false)}"
-#       self.define_method(name) do
-#         self.instance_eval(&@interceptor.procBefore)
-#         unbound_method.bind(self).call
-#         self.instance_eval(&@interceptor.procAfter)
-#       end
-#     else
-#       @seSobreescribio = false
-#     end
-#   end
-# end
-#
-#
-# #usar attr accesor y metodos de atributos
-# #esto no haria falta si el initialize esta contem´lado con el method added
-# # class Class
-# #   def new(args, &block)
-# #     # Tu implementación personalizada del método new aquí
-# #     instancia = allocate  # Crea una nueva instancia sin llamar a initialize
-# #     instancia.initialize(args, &block)  # Llama a initialize con los argumentos proporcionados
-# #     @invariantes.map { |invariant| instancia.instance_eval(invariant)}
-# #     return instancia
-# #   end
-# # end
