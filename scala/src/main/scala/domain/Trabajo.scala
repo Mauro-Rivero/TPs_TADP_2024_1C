@@ -1,6 +1,6 @@
 package domain
 // debe ser una trait?
-class Trabajo(statPrincipal : String) {
+class Trabajo(modificaciones : ModificacionStats, statPrincipal) {
 
 
 }

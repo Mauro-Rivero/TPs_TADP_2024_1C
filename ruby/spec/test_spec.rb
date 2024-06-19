@@ -55,10 +55,6 @@ describe 'Prueba' do
       dividendo / divisor
     end
 
-    def divisor()
-
-    end
-
     Node = Struct.new(:element, :next_node) do
       def size
         next_node.nil? ? 1 : 1 + next_node.size

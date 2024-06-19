@@ -47,9 +47,9 @@ module Contrato
           # [CORRECCION]
           # En lugar de copiar el proc al contexto, ¿por qué no pedirse a la clase de self?
           define_method(method_name) do |*args, &block|
-            preProc.call(self)
+            preProc.call(self, *args)
             original_method.bind(self).call(*args, &block)
-            postProc.call(self)
+            postProc.call(self, *args)
             invariantProc.call(self)
           end
         else
@@ -57,15 +57,10 @@ module Contrato
           afterProc = listToProc(@procsAfter, "")
           beforeProc = listToProc(@procsBefore, "")
           define_method(method_name) do |*args, &block|
-            (0...args.length).each { |i|
-              self.define_singleton_method(parametros[i])do
-                args[i]
-              end
-            }
             beforeProc.call(self)
-            preProc.call(self)
+            preProc.call(self, *args)
             ret = original_method.bind(self).call(*args, &block)
-            postProc.call(self,ret)
+            postProc.call(self, *args, ret)
             afterProc.call(self)
             invariantProc.call(self)
             return ret
@@ -86,7 +81,7 @@ module Contrato
       proc{}
     else
       listaClonada = lista.clone
-      proc{|obj,result| raise mensajeDeError if listaClonada.any?{|unProc| !obj.instance_exec(result,&unProc)}}
+      proc{|obj, *args, result| raise mensajeDeError if listaClonada.any?{|unProc| !obj.instance_exec(*args,result,&unProc)}}
     end
   end
 end

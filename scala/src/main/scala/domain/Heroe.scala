@@ -1,27 +1,21 @@
 package domain
 
-abstract class Heroe (hp: Int, fuerza: Int, velocidad: Int, inteligencia: Int ){
+abstract class Heroe (val statsBase: Stats){
   val inventario : List[Item] = List()
-  var trabajo : Trabajo
-  var casco : Casco
-  var manoIzquierda: Arma
-  var manoDerecha: Arma
-  var Manos : Arma
-//var Armas : List[Arma] = List() alternativa
+  val trabajo : Trabajo
+  val casco : Option[Casco]
+  val manoIzquierda: Option[Arma]
+  val manoDerecha: Option[Arma]
+  val stats:Stats
 
   def saludar() : Unit
    println("hola")
 
-  //dameFuerza :: Armas -> [Armadura] -> Heroe -> Heroe
-  //dameFuerza armas armaduras heroe =  foldr (modificarStats) heroe (armaduras : armas)
+  def getStats(): Stats = {
+  List(trabajo, casco, manoDerecha, manoIzquierda).fold(statsBase)()
+  }
 
-  //aplicarArmamento :: Heroe -> Heroe
-
-  calcularStat :: Heroe -> Heroe
-  calcualrStat heroe = normalizarStat . aplicarArmamento $ heroe
-
-  normalizarStat
-  normalizarStat  heroe = max (1, stat heroe)
-
-
+  def cambiarTrabajoA(nuevoTrabajo: Trabajo): Unit = {
+    this.copy(trabajo = nuevoTrabajo)
+  }
 }
