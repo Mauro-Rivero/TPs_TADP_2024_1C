@@ -1,21 +1,28 @@
 package domain
+import scala.collection.Set
 
 abstract class Heroe (val statsBase: Stats){
   val inventario : List[Item] = List()
-  val trabajo : Trabajo
-  val casco : Option[Casco]
-  val manoIzquierda: Option[Arma]
-  val manoDerecha: Option[Arma]
-  val stats:Stats
+  val trabajo : Option[Trabajo] = None
+  val cabeza : Option[Cabeza] = None
+  val torso : Option[Torso] = None
+  val manoIzquierda: Option[Arma] = None
+  val manoDerecha: Option[Arma] = None
 
   def saludar() : Unit
    println("hola")
 
   def getStats(): Stats = {
-  List(trabajo, casco, manoDerecha, manoIzquierda).fold(statsBase)()
+    Set(trabajo, cabeza, torso, armaEquipada(), talismanes()).map(_.stats).fold(statsBase)(_+_).toValid()
+  }
+  
+  def talismanes(): Unit = {
+    
+  }
+  
+  def armaEquipada(): Unit = {
+    
   }
 
-  def cambiarTrabajoA(nuevoTrabajo: Trabajo): Unit = {
-    this.copy(trabajo = nuevoTrabajo)
-  }
 }
+
