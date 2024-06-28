@@ -11,7 +11,7 @@ class Stats(val hp: Int = 0, val velocidad: Int = 0, val fuerza: Int = 0, val in
     )
   }
   
-  def toValid(): Stats = {
+  def toValid: Stats = {
     new Stats(
       hp = Math.max(hp,1),
       velocidad= Math.max(velocidad,1),

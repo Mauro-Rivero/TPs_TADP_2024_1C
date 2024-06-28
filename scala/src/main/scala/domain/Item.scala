@@ -1,25 +1,41 @@
 package domain
 
-case class Item(stats: Stats, restriccion: Restriccion) {
-
+class Item( modificacion: Modificacion, restriccion: Restriccion) {
+  
+  def apply(heroe:Heroe): Stats = {
+    modificacion(heroe)
+  }
 }
 
-//type Cabeza <: Item
+case class Cabeza(modificacion: Modificacion, restriccion: Restriccion) extends Item(modificacion, restriccion)
+class Casco(modificacion: Modificacion, restriccion: Restriccion) extends Cabeza(modificacion, restriccion)
+case class Torso(modificacion: Modificacion, restriccion: Restriccion) extends Item(modificacion, restriccion)
+case class Talisman(modificacion: Modificacion, restriccion: Restriccion) extends Item(modificacion, restriccion)
+case class Mano(modificacion: Modificacion, restriccion: Restriccion, tipo:Tipo) extends Item(modificacion, restriccion)
+
+sealed trait Tipo
+case object UnaMano extends Tipo
+case object DosManos extends Tipo
+
+//
+//type Cabeza <: Tipo
 //type Sombrero <: Cabeza
 //type Casco <: Cabeza
-//type Torso <: Item
+//type Torso <: Tipo
 //type Armadura <: Torso
 //type Vestido <: Torso
-//type UnaMano <: Item
+//type UnaMano <: Tipo
+//type DosManos <: Tipo
+//type Talisman <: Tipo
 //type Arma <: Item
 //type Escudo <: Item
 
 def fuerzaBaseMayorA(valor: Int): Restriccion = { (heroe: Heroe) => heroe.statsBase.fuerza > valor }
-val cascoVikingo: Item = Item(new Stats(hp = 10), fuerzaBaseMayorA(30))
+//val cascoVikingo: Item = Item(new Stats(hp = 10), fuerzaBaseMayorA(30))
 
-val soloMagos: Restriccion = (heroe: Heroe) => heroe.trabajo.contains(Mago) // TODO ARREGLAR
+//val soloMagos: Restriccion = (heroe: Heroe) => heroe.trabajo.contains(Mago) // TODO ARREGLAR
 
-val palitoMagico: Item = Item(Stats(inteligencia = 20), soloMagos)
+//val palitoMagico: Item = Item(Stats(inteligencia = 20), soloMagos)
 //
 //Casco Vikingo: +10 hp, sólo lo pueden usar héroes con fuerza base > 30. Va en la cabeza.
 //  Palito mágico: +20 inteligencia, sólo lo pueden usar magos (o ladrones con más de 30 de inteligencia base). Una mano.

@@ -1,28 +1,42 @@
 package domain
 import scala.collection.Set
 
-abstract class Heroe (val statsBase: Stats){
-  val inventario : List[Item] = List()
-  val trabajo : Option[Trabajo] = None
-  val cabeza : Option[Cabeza] = None
-  val torso : Option[Torso] = None
-  val manoIzquierda: Option[Arma] = None
-  val manoDerecha: Option[Arma] = None
-
-  def saludar() : Unit
-   println("hola")
+case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo: Trabajo){
+  //Deberia haber un trabajo Desempleado? o seria una monada?
+  require(getFuerza() >= 1)
+  require(getHp() >= 1)
+  require(getVelocidad() >= 1)
+  require(getInteligencia() >= 1)
+  //No va a romper en ningun momento que no sea la creacion del heroe, pq siempre lo mantenemos en estaods validos
 
   def getStats(): Stats = {
-    Set(trabajo, cabeza, torso, armaEquipada(), talismanes()).map(_.stats).fold(statsBase)(_+_).toValid()
+    (inventario.stats(this) + trabajo.stats ).toValid
   }
-  
-  def talismanes(): Unit = {
-    
+
+  def getFuerza(): Int = getStats().fuerza
+
+  def getInteligencia(): Int = getStats().inteligencia
+
+  def getVelocidad(): Int = getStats().velocidad
+
+  def getHp(): Int = this.getStats().hp
+
+  def cambiarTrabajo(untraba: Trabajo): Unit = {
+    trabajo = untraba
   }
-  
-  def armaEquipada(): Unit = {
-    
+
+  def equiparItem(item: Item): Heroe = {
+    if(item.restriccion(this)){
+      this.copy(inventario = inventario.equipar(item))
+    } else{
+      this
+    }
   }
 
 }
 
+//cambiarTrabajoA(unHeroe, Guerrero)
+//unHeroe = unHeroe.cambiarTrabajo(Guerrero)
+//
+//Si nos conviene que el trabajo y todos los items sean monadas o tener un objeto "Desempleado"
+//

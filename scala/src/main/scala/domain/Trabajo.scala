@@ -1,9 +1,8 @@
 package domain
 
 // debe ser una trait?
-class Trabajo(stats: Stats, statPrincipal: StatPrincipal) {
-
-
+class Trabajo(val stats: Stats, val statPrincipal: StatPrincipal) {
+  
 }
 
 
