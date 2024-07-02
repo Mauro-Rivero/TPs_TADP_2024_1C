@@ -15,6 +15,5 @@ type Restriccion = Function1[Heroe, Boolean]
 
 type Modificacion = Function1[Heroe, Stats]
 
-type Tarea = Function1[Heroe, Heroe]
+type Cuantificador = Function1[Heroe, Int]
 
-type Mision = List[Tarea]

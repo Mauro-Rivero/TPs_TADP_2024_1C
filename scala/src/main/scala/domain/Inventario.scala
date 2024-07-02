@@ -3,23 +3,21 @@ package domain
 case class Inventario(cabeza: Option[Item], torso : Option[Item] = None, manos: List[Item] = List(), talismanes: List[Item] = List()) {
   
   def equipar(item: Item): Inventario = {
-    item match {
-      case Cabeza(_, _) => this.copy(cabeza = Some(item))
-      case Torso(_, _) => this.copy(torso = Some(item))
-      case Talisman(_, _) => this.copy(talismanes = talismanes.::(item))
-      case Mano(_, _, DosManos) => this.copy(manos = List(item))
-      case Mano(_, _, UnaMano) =>
-        this.copy(manos = if (manos.contains((x: Mano) => x.tipo == DosManos)) {
-          List(item)
-        } else if (manos.size == 2) {
-          manos.take(1).::(item)
-        } else {
+    item.tipo match {
+      case _: Cabeza => this.copy(cabeza = Some(item))
+      case _: Torso => this.copy(torso = Some(item))
+      case Talisman => this.copy(talismanes = talismanes.::(item))
+      case DosManos => this.copy(manos = List(item))
+      case UnaMano =>
+        this.copy(manos = if (manos.count((x: Item) => x.tipo == UnaMano) < 2) {
           manos.::(item)
+        } else {
+          manos.take(1).::(item)
         })
     }
   }
     
     def stats(heroe:Heroe): Stats = {
-      List(cabeza, torso, manos, talismanes).flatten.map(_.modificacion(heroe)).fold(heroe.statsBase)(_+_)
+      List(cabeza, torso, manos, talismanes).flatten.map(_(heroe)).fold(heroe.statsBase)(_+_)
     }
 }

@@ -19,7 +19,9 @@ case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo:
 
   def getVelocidad(): Int = getStats().velocidad
 
-  def getHp(): Int = this.getStats().hp
+  def getHp(): Int = getStats().hp
+  
+  def statPrincipal(): Int = trabajo.statPrincipal(this)
 
   def cambiarTrabajo(untraba: Trabajo): Unit = {
     trabajo = untraba
@@ -33,6 +35,9 @@ case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo:
     }
   }
 
+  def esPositivoEquipar(item: Item): Boolean = {
+    statPrincipal() < equiparItem(item).statPrincipal()
+  }
 }
 
 //cambiarTrabajoA(unHeroe, Guerrero)

@@ -1,21 +1,35 @@
 package domain
 
-class Item( modificacion: Modificacion, restriccion: Restriccion) {
+case class Item( modificacion: Modificacion, restriccion: Restriccion, tipo: Tipo, precio: Int = 0) {
   
   def apply(heroe:Heroe): Stats = {
     modificacion(heroe)
   }
 }
 
-case class Cabeza(modificacion: Modificacion, restriccion: Restriccion) extends Item(modificacion, restriccion)
-class Casco(modificacion: Modificacion, restriccion: Restriccion) extends Cabeza(modificacion, restriccion)
-case class Torso(modificacion: Modificacion, restriccion: Restriccion) extends Item(modificacion, restriccion)
-case class Talisman(modificacion: Modificacion, restriccion: Restriccion) extends Item(modificacion, restriccion)
-case class Mano(modificacion: Modificacion, restriccion: Restriccion, tipo:Tipo) extends Item(modificacion, restriccion)
-
 sealed trait Tipo
-case object UnaMano extends Tipo
-case object DosManos extends Tipo
+
+sealed trait Cabeza extends Tipo
+
+case object Casco extends Cabeza
+
+case object Sombrero extends Cabeza
+
+sealed trait Torso extends Tipo
+
+case object Armadura extends Torso
+
+case object Vestido extends Torso
+
+case object Talisman extends Tipo
+
+sealed trait Arma extends Tipo
+
+sealed trait Escudo extends Tipo
+
+case object UnaMano extends Arma with Escudo
+
+case object DosManos extends Arma
 
 //
 //type Cabeza <: Tipo
@@ -35,10 +49,10 @@ def fuerzaBaseMayorA(valor: Int): Restriccion = { (heroe: Heroe) => heroe.statsB
 
 //val soloMagos: Restriccion = (heroe: Heroe) => heroe.trabajo.contains(Mago) // TODO ARREGLAR
 
-//val palitoMagico: Item = Item(Stats(inteligencia = 20), soloMagos)
+val palitoMagico: Item = Item(_ => Stats(inteligencia = 20), _.trabajo == Mago, UnaMano:Arma)
 //
 //Casco Vikingo: +10 hp, sólo lo pueden usar héroes con fuerza base > 30. Va en la cabeza.
-//  Palito mágico: +20 inteligencia, sólo lo pueden usar magos (o ladrones con más de 30 de inteligencia base). Una mano.
+//  Palito mágico: +20 inteligencia, sólo lo pueden usar magos (>o ladrones con más de 30 de inteligencia base). Una mano.
 //Armadura Elegante-Sport: +30 velocidad, -30 hp. Armadura.
 //  Arco Viejo: +2 fuerza. Ocupa las dos manos.
 //Escudo Anti-Robo: +20 hp. No pueden equiparlo los ladrones ni nadie con menos de 20 de fuerza base. Una mano.
