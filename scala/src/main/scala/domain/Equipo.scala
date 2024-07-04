@@ -12,21 +12,13 @@ case class Equipo(nombre: String, miembros: Set[Heroe] = Set(), pozoComun: Int =
     }
   }
 
-  def vender( item: Item): Equipo = {
-    this.copy(pozoComun = pozoComun + item.precio)
-  }
+  def vender( item: Item): Equipo = this.copy(pozoComun = pozoComun + item.precio)
 
-  def obtenerMiembro(heroe: Heroe): Equipo = {
-    this.copy(miembros = miembros + heroe)
-  }
+  def obtenerMiembro(heroe: Heroe): Equipo = this.copy(miembros = miembros + heroe)
+  
+  def eliminarMiembro(heroe: Heroe): Equipo = this.copy(miembros = miembros - heroe)
 
-  def eliminarMiembro(heroe: Heroe): Equipo = {
-    this.copy(miembros = miembros - heroe)
-  }
-
-  def reemplazarMiembro(unMiembro: Heroe, otroMiembro: Heroe): Equipo = {
-    eliminarMiembro(unMiembro).obtenerMiembro(otroMiembro)
-  }
+  def reemplazarMiembro(unMiembro: Heroe, otroMiembro: Heroe): Equipo = eliminarMiembro(unMiembro).obtenerMiembro(otroMiembro)
 
   def lider(): Option[Heroe] = {
     val mejor = mejorHeroeSegun(_.statPrincipal())

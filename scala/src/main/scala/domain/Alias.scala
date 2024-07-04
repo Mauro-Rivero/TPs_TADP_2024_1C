@@ -1,19 +1,20 @@
 package domain
 
-type StatPrincipal = Function1[Heroe, Int]
+type StatPrincipal = Heroe => Int
 
-val Fuerza: StatPrincipal       = (heroe:Heroe) => heroe.getFuerza() 
+val Fuerza: StatPrincipal       = _.getFuerza() 
 
-val Hp: StatPrincipal           = (heroe:Heroe) => heroe.getHp() 
+val Hp: StatPrincipal           = _.getHp() 
 
-val Velocidad: StatPrincipal    = (heroe:Heroe) => heroe.getVelocidad() 
+val Velocidad: StatPrincipal    = _.getVelocidad() 
 
-val Inteligencia: StatPrincipal = (heroe:Heroe) => heroe.getInteligencia()
+val Inteligencia: StatPrincipal = _.getInteligencia()
 
 
-type Restriccion = Function1[Heroe, Boolean]
+type Restriccion = Heroe => Boolean
 
-type Modificacion = Function1[Heroe, Stats]
+type Modificacion = Heroe => Stats
 
-type Cuantificador = Function1[Heroe, Int]
+type Cuantificador = Heroe => Int
 
+type Criterio = (Equipo, Equipo) => Boolean

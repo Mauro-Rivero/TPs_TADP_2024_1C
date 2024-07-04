@@ -20,12 +20,15 @@ case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo:
   def getVelocidad(): Int = getStats().velocidad
 
   def getHp(): Int = getStats().hp
-  
+
+  def alterarFuerza(valor: Int): Heroe = this.copy(statsBase= statsBase.alterarFuerza(valor))
+  def alterarInteligencia(valor: Int): Heroe = this.copy(statsBase= statsBase.alterarInteligencia(valor))
+  def alterarHp(valor: Int): Heroe = this.copy(statsBase= statsBase.alterarHp(valor))
+  def alterarVelocidad(valor: Int): Heroe = this.copy(statsBase= statsBase.alterarVelocidad(valor))
+
   def statPrincipal(): Int = trabajo.statPrincipal(this)
 
-  def cambiarTrabajo(untraba: Trabajo): Unit = {
-    trabajo = untraba
-  }
+  def cambiarTrabajo(untraba: Trabajo): Heroe = this.copy(trabajo = untraba)
 
   def equiparItem(item: Item): Heroe = {
     if(item.restriccion(this)){

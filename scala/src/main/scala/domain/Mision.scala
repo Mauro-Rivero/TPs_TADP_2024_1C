@@ -1,5 +1,5 @@
 package domain
 
-class Mision(tareas: List[Tarea] = List(), recompensa: Modificacion) {
+case class Mision(tareas: List[Tarea] = List(), recompensa: Recompensa) {
 
 }
