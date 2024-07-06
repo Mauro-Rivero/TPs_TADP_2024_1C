@@ -18,3 +18,7 @@ type Modificacion = Heroe => Stats
 type Cuantificador = Heroe => Int
 
 type Criterio = (Equipo, Equipo) => Boolean
+
+type Dificultad = Heroe => Int
+
+type Recompensa = Equipo => Equipo
