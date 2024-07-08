@@ -18,6 +18,6 @@ case class Inventario(cabeza: Option[Item], torso : Option[Item] = None, manos: 
   }
     
     def stats(heroe:Heroe): Stats = {
-      List(cabeza, torso, manos, talismanes).flatten.map(_(heroe)).fold(heroe.statsBase)(_+_)
+      List(cabeza, torso, manos, talismanes).flatten.map(_(heroe)).foldLeft(heroe.statsBase)((x,y) => x + y.statsBase)
     }
 }

@@ -1,5 +1,7 @@
 package domain
 
+import scala.util.{Failure, Success, Try}
+
 case class Equipo(nombre: String, miembros: Set[Heroe] = Set(), pozoComun: Int = 0){
 
   def mejorHeroeSegun(criterio: Cuantificador): Option[Heroe] =  miembros.maxByOption(criterio)
@@ -28,6 +30,37 @@ case class Equipo(nombre: String, miembros: Set[Heroe] = Set(), pozoComun: Int =
         case Some(segundoLider) if lider.statPrincipal() == segundoLider.statPrincipal() => None
         case _ => Some(lider)
       }
+    }
+  }
+
+  def realizar(mision: Mision): Equipo = {
+    tratarDeRealizarTareas(mision.tareas) match {
+      case None => this
+      case Some(equipo) => mision.recompensa(equipo)
+    }
+  }
+  
+  def puedeRealizar(mision: Mision): Boolean = {
+    tratarDeRealizarTareas(mision.tareas) match {
+      case None => false
+      case Some(_) => true
+    }
+  }
+  
+  private def tratarDeRealizarTareas(tareas: List[Tarea]): Option[Equipo] = {
+    tareas.foldLeft(Option(this)) {
+      case (None, _) => None
+      case (Some(equipo), tarea) => equipo.tratarDeRealizarTarea(tarea)
+    }
+  }
+
+  private def tratarDeRealizarTarea(tarea:Tarea): Option[Equipo] = {
+    if(tarea.condicionDeRealizacion(this)){ //Interpretamos que la condicion de las tareas es sobre el equipo
+      mejorHeroeSegun(heroe => tarea.facilidad(heroe)).map { heroe =>
+          reemplazarMiembro(heroe, heroe.realizar(tarea))
+        }
+    }else{
+      None
     }
   }
 }

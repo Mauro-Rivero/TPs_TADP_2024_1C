@@ -1,5 +1,4 @@
 package domain
 
-class Tarea(condicion: Option[Restriccion], modificacion: Modificacion, facilidad: Dificultad){
-
+case class Tarea(condicion: Option[Restriccion], modificacion: Modificacion, facilidad: Facilidad, condicionDeRealizacion: CondicionDeRealizacion){
 }

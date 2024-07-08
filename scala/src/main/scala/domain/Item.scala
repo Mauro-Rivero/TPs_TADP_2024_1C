@@ -2,7 +2,7 @@ package domain
 
 case class Item( modificacion: Modificacion, restriccion: Restriccion, tipo: Tipo, precio: Int = 0) {
   
-  def apply(heroe:Heroe): Stats = {
+  def apply(heroe:Heroe): Heroe = {
     modificacion(heroe)
   }
 }
@@ -49,8 +49,9 @@ def fuerzaBaseMayorA(valor: Int): Restriccion = { (heroe: Heroe) => heroe.statsB
 
 //val soloMagos: Restriccion = (heroe: Heroe) => heroe.trabajo.contains(Mago) // TODO ARREGLAR
 
-val palitoMagico: Item = Item(_ => Stats(inteligencia = 20), _.trabajo == Mago, UnaMano:Arma)
+val palitoMagico: Item = Item(_.alterarInteligencia(20), _.trabajo == Mago, UnaMano:Arma)
 //
+val cascoVikingo: Item = Item(_.alterarHp(10), _.getFuerzaBase()>30, Casco:Cabeza)
 //Casco Vikingo: +10 hp, sólo lo pueden usar héroes con fuerza base > 30. Va en la cabeza.
 //  Palito mágico: +20 inteligencia, sólo lo pueden usar magos (>o ladrones con más de 30 de inteligencia base). Una mano.
 //Armadura Elegante-Sport: +30 velocidad, -30 hp. Armadura.

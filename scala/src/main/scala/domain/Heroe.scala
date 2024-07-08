@@ -1,5 +1,6 @@
 package domain
-import scala.collection.Set
+
+import scala.util.Try
 
 case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo: Trabajo){
   //Deberia haber un trabajo Desempleado? o seria una monada?
@@ -13,6 +14,14 @@ case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo:
     (inventario.stats(this) + trabajo.stats ).toValid
   }
 
+  def getFuerzaBase(): Int = statsBase.fuerza
+
+  def getInteligenciaBase(): Int = statsBase.inteligencia
+
+  def getVelocidadBase(): Int = statsBase.velocidad
+
+  def getHpBase(): Int = statsBase.hp
+
   def getFuerza(): Int = getStats().fuerza
 
   def getInteligencia(): Int = getStats().inteligencia
@@ -22,8 +31,11 @@ case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo:
   def getHp(): Int = getStats().hp
 
   def alterarFuerza(valor: Int): Heroe = this.copy(statsBase= statsBase.alterarFuerza(valor))
+  
   def alterarInteligencia(valor: Int): Heroe = this.copy(statsBase= statsBase.alterarInteligencia(valor))
+  
   def alterarHp(valor: Int): Heroe = this.copy(statsBase= statsBase.alterarHp(valor))
+  
   def alterarVelocidad(valor: Int): Heroe = this.copy(statsBase= statsBase.alterarVelocidad(valor))
 
   def statPrincipal(): Int = trabajo.statPrincipal(this)
@@ -40,6 +52,13 @@ case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo:
 
   def esPositivoEquipar(item: Item): Boolean = {
     statPrincipal() < equiparItem(item).statPrincipal()
+  }
+  
+  def realizar(tarea: Tarea): Heroe = {     
+    tarea.condicion.match {
+        case Some(cond) if cond(this) => tarea.modificacion(this)
+        case _ => this
+      }
   }
 }
 
