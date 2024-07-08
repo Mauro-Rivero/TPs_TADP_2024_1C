@@ -16,7 +16,7 @@ case class Taberna (var tablon: List[Mision] = List()){
 
   def entrenar(equipo:Equipo, criterio: Criterio, tablon: List[Mision] = this.tablon):(Equipo, List[Mision]) = { //agrego criterio pues dice que elige la mejor mision.. Segun qué?
     elegirMisionPara(equipo, criterio) match {
-      case Some(mision) => entrenar(equipo.realizar(mision), criterio, this.sacarMisionDeTablon(mision))
+      case Some(mision) => entrenar(equipo.realizar(mision), criterio, sacarMisionDeTablon(tablon, mision))
       case None => (equipo, tablon)
     }
   }
