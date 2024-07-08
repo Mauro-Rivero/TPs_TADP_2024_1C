@@ -18,6 +18,13 @@ case class Taberna(tablon: List[Mision]) extends App{
       case None => equipo
     }
   }
+  /* OPCION DE CORRECCION FUNCION  entrenar(equipo: Equipo, criterio: Criterio) DE ARRIBA
+  def entrenar(equipo: Equipo, criterio: Criterio): Equipo = { //agrego criterio pues dice que elige la mejor mision.. Segun qué?
+    elegirMisionPara(equipo, criterio).map(mision => this.sacarMision(mision).entrenar(equipo.realizar(mision), criterio)).getOrElse(equipo)
+    }
+
+   */
+  }
 
 //  def entrenar(equipo:Equipo):Equipo = {
 //  ???
