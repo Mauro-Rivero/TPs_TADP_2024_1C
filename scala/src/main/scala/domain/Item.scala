@@ -31,6 +31,8 @@ case object UnaMano extends Arma with Escudo
 
 case object DosManos extends Arma
 
+//Eliminar tipos extra
+
 //
 //type Cabeza <: Tipo
 //type Sombrero <: Cabeza

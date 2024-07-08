@@ -3,7 +3,6 @@ package domain
 import scala.util.Try
 
 case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo: Trabajo){
-  //Deberia haber un trabajo Desempleado? o seria una monada?
   require(getFuerza() >= 1)
   require(getHp() >= 1)
   require(getVelocidad() >= 1)
@@ -54,11 +53,12 @@ case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo:
     statPrincipal() < equiparItem(item).statPrincipal()
   }
   
-  def realizar(tarea: Tarea): Heroe = {     
-    tarea.condicion.match {
-        case Some(cond) if cond(this) => tarea.modificacion(this)
-        case _ => this
-      }
+  def realizar(tarea: Tarea): Heroe = {
+    if (tarea.condicion.exists(_(this))) {
+      tarea.modificacion(this)
+    } else {
+      this
+    }
   }
 }
 

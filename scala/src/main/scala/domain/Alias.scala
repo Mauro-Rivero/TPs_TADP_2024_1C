@@ -24,7 +24,7 @@ type Cuantificador = Heroe => Int
 
 type Criterio = (Equipo, Equipo) => Boolean
 
-type Facilidad = Heroe => Int
+type Facilidad = Heroe => Int  // OPTON[Int]
 
 type Recompensa = Equipo => Equipo
 //

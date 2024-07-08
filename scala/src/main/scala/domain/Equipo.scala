@@ -1,10 +1,10 @@
 package domain
 
-import scala.util.{Failure, Success, Try}
 
 case class Equipo(nombre: String, miembros: Set[Heroe] = Set(), pozoComun: Int = 0){
 
-  def mejorHeroeSegun(criterio: Cuantificador): Option[Heroe] =  miembros.maxByOption(criterio)
+  def mejorHeroeSegun(criterio: Cuantificador): Option[Heroe] =  miembros.maxByOption(criterio) //mejorHeroeSegunOptional....
+  def mejorHeroeSegunOptional(criterio: Cuantificador): Option[Heroe] =  miembros.maxByOption(criterio)
 
   def obtenerItem(item:Item): Equipo = {
     val heroeACambiar = mejorHeroeSegun(heroe => heroe.equiparItem(item).statPrincipal() -  heroe.statPrincipal()) // al no tener efecto sabemos que heroe es pero sin modificarlo
@@ -40,12 +40,7 @@ case class Equipo(nombre: String, miembros: Set[Heroe] = Set(), pozoComun: Int =
     }
   }
   
-  def puedeRealizar(mision: Mision): Boolean = {
-    tratarDeRealizarTareas(mision.tareas) match {
-      case None => false
-      case Some(_) => true
-    }
-  }
+  def puedeRealizar(mision: Mision): Boolean = tratarDeRealizarTareas(mision.tareas).isDefined
   
   private def tratarDeRealizarTareas(tareas: List[Tarea]): Option[Equipo] = {
     tareas.foldLeft(Option(this)) {
@@ -55,7 +50,7 @@ case class Equipo(nombre: String, miembros: Set[Heroe] = Set(), pozoComun: Int =
   }
 
   private def tratarDeRealizarTarea(tarea:Tarea): Option[Equipo] = {
-    if(tarea.condicionDeRealizacion(this)){ //Interpretamos que la condicion de las tareas es sobre el equipo
+    if(tarea.condicionDeRealizacion(this)){ //ES OPTIONAL
       mejorHeroeSegun(heroe => tarea.facilidad(heroe)).map { heroe =>
           reemplazarMiembro(heroe, heroe.realizar(tarea))
         }
