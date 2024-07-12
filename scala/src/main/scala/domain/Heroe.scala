@@ -1,7 +1,5 @@
 package domain
 
-import scala.util.Try
-
 case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo: Trabajo){
   require(getFuerza() >= 1)
   require(getHp() >= 1)
@@ -62,8 +60,3 @@ case class Heroe (var statsBase: Stats, var inventario: Inventario, var trabajo:
   }
 }
 
-//cambiarTrabajoA(unHeroe, Guerrero)
-//unHeroe = unHeroe.cambiarTrabajo(Guerrero)
-//
-//Si nos conviene que el trabajo y todos los items sean monadas o tener un objeto "Desempleado"
-//
