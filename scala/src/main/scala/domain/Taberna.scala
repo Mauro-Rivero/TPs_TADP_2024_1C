@@ -13,27 +13,12 @@ case class Taberna(tablon: List[Mision]) extends App{
   }
 
   def entrenar(equipo: Equipo, criterio: Criterio): Equipo = { //agrego criterio pues dice que elige la mejor mision.. Segun qué?
-    elegirMisionPara(equipo, criterio) match {
+    elegirMisionPara(equipo, criterio). match {
       case Some(mision) => this.sacarMision(mision).entrenar(equipo.realizar(mision), criterio)
       case None => equipo
     }
   }
-  /* OPCION DE CORRECCION FUNCION  entrenar(equipo: Equipo, criterio: Criterio) DE ARRIBA
-  def entrenar(equipo: Equipo, criterio: Criterio): Equipo = { //agrego criterio pues dice que elige la mejor mision.. Segun qué?
-    elegirMisionPara(equipo, criterio).map(mision => this.sacarMision(mision).entrenar(equipo.realizar(mision), criterio)).getOrElse(equipo)
+  def entrenar2(equipo: Equipo, criterio: Criterio): Equipo = { //agrego criterio pues dice que elige la mejor mision.. Segun qué?
+    elegirMisionPara(equipo, criterio).map(mision => this.sacarMision(mision).entrenar2(equipo.realizar(mision), criterio)).getOrElse(equipo)
     }
-
-   */
-  }
-
-//  def entrenar(equipo:Equipo):Equipo = {
-//  ???
-//  }
-//
-//  
-//  equipo = entrenar(equipo)
 }
-//Entrenar: Cuando un equipo entrena, intenta realizar todas las misiones, una por una,
-//eligiendo la mejor misión para hacer a continuación. Cada misión se realiza luego de haber cobrado
-//  la recompensa de la anterior y el equipo no se detiene hasta haber finalizado todas las misiones o
-//  fallar una.
