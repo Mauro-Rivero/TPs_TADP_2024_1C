@@ -1,7 +1,5 @@
 package domain
 
-import scala.util.{Success, Try}
-
 
 type StatPrincipal = Heroe => Int
 
@@ -22,19 +20,11 @@ type Modificacion = Heroe => Heroe
 
 type Cuantificador = Heroe => Int
 
+type CuantificadorOptional = Heroe => Option[Int]
+
 type Criterio = (Equipo, Equipo) => Boolean
 
-type Facilidad = Heroe => Int  // OPTON[Int]
+type Facilidad = Heroe => Option[Int]  // OPTON[Int]
 
 type Recompensa = Equipo => Equipo
-//
-//def incrementarSegun(stats:Stats, condicion: Restriccion) : Recompensa
-//
-//val mision = Mision(List(), incrementarSegun(Stats(hp = 10), _.trabajo == Mago))
-
-object Result {
-  def apply(equipo: => Equipo): Try[Equipo] = 
-    Success(equipo)
-  
-}
 
